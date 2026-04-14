@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Animalia | Ensiklopedia Hewan Elegan + Fitur Interaktif Premium</title>
+    <!-- Google Fonts: Inter + Playfair -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s;
+        }
+
+        :root {
+            --bg-body: #f9f7f3;
+            --surface: #ffffff;
+            --surface-soft: #fefcf8;
+            --text-primary: #2c2b28;
+            --text-secondary: #6c6a67;
+            --accent: #2f5e4c;
+            --accent-light: #5f8b6f;
+            --border-light: #ece6df;
+            --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+            --hover-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.12);
+            --tag-bg: #f7f5f2;
+        }
+
+        body.dark {
+            --bg-body: #121212;
+            --surface: #1e1e1e;
+            --surface-soft: #2a2a2a;
+            --text-primary: #efedea;
+            --text-secondary: #b0aea8;
+            --accent: #7aa393;
+            --accent-light: #8bb29e;
+            --border-light: #2e2e2c;
+            --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            --hover-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.5);
+            --tag-bg: #2c2c2a;
+        }
+
+        body {
+            background: var(--bg-body);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* navbar glassmorphic */
+        .navbar {
+            background: rgba(var(--bg-body-rgb, 249, 247, 243), 0.85);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.03);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0.8rem 0;
+        }
+        body.dark .navbar {
+            background: rgba(18, 18, 18, 0.9);
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo a {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: color 0.2s;
+        }
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+        .dark-toggle {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            padding: 0.3rem 0.8rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* hero */
+        .hero {
+            padding: 2rem 0 1.5rem;
+            text-align: center;
+            background: radial-gradient(circle at 10% 30%, rgba(95, 139, 111, 0.05), transparent);
+        }
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.9rem;
+            font-weight: 500;
+            background: linear-gradient(135deg, var(--accent), #b9aa7a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .hero p {
+            font-size: 1rem;
+            max-width: 580px;
+            margin: 0.8rem auto 0;
+            color: var(--text-secondary);
+        }
+
+        /* search & filter bar */
+        .search-filter {
+            background: var(--surface);
+            border-radius: 60px;
+            padding: 0.6rem 1.2rem;
+            margin: 1.5rem 0 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+        .search-box {
+            flex: 2;
+            min-width: 180px;
+            display: flex;
+            align-items: center;
+            background: var(--bg-body);
+            border-radius: 40px;
+            padding: 0.3rem 1rem;
+            border: 1px solid var(--border-light);
+        }
+        .search-box i {
+            color: var(--text-secondary);
+            margin-right: 8px;
+        }
+        .search-box input {
+            border: none;
+            background: transparent;
+            padding: 0.6rem 0;
+            width: 100%;
+            font-size: 0.9rem;
+            outline: none;
+            color: var(--text-primary);
+        }
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-btn, .sort-select, .fav-filter-btn, .reset-btn {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            padding: 0.45rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+        .filter-btn.active, .fav-filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        .filter-btn:hover:not(.active), .fav-filter-btn:hover, .reset-btn:hover {
+            background: var(--tag-bg);
+            border-color: var(--text-secondary);
+        }
+        .sort-select {
+            background: var(--surface);
+            cursor: pointer;
+        }
+        .reset-btn {
+            background: var(--surface);
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 500;
+            margin: 2rem 0 0.5rem;
+            font-family: 'Playfair Display', serif;
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .result-count {
+            font-size: 0.85rem;
+            background: var(--tag-bg);
+            padding: 0.2rem 0.9rem;
+            border-radius: 30px;
+        }
+        .animal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 1.8rem 0 3rem;
+        }
+        .card {
+            background: var(--surface);
+            border-radius: 28px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            position: relative;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--hover-shadow);
+        }
+        .card-img {
+            width: 100%;
+            height: 210px;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        .card:hover .card-img {
+            transform: scale(1.02);
+        }
+        .card-content {
+            padding: 1.2rem 1.2rem 1.3rem;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-title {
+            font-size: 1.35rem;
+            font-weight: 600;
+        }
+        .favorite-icon {
+            color: #eab308;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform 0.1s;
+            background: transparent;
+            border: none;
+        }
+        .favorite-icon:hover {
+            transform: scale(1.1);
+        }
+        .scientific {
+            font-size: 0.7rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            margin: 0.2rem 0 0.6rem;
+            border-left: 3px solid var(--accent-light);
+            padding-left: 8px;
+        }
+        .desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            margin-bottom: 0.8rem;
+        }
+        .fact {
+            background: var(--tag-bg);
+            padding: 0.5rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--accent);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-card {
+            background: var(--surface);
+            max-width: 550px;
+            width: 90%;
+            border-radius: 32px;
+            overflow: hidden;
+            animation: fadeUp 0.25s ease;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .modal-img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+        }
+        .modal-content {
+            padding: 1.8rem;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        .extra-fact {
+            background: var(--tag-bg);
+            padding: 0.8rem;
+            border-radius: 20px;
+            margin-top: 1rem;
+        }
+        .random-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 54px;
+            height: 54px;
+            border-radius: 30px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+            z-index: 99;
+            transition: all 0.2s;
+        }
+        .random-btn:hover {
+            transform: scale(1.05);
+            background: var(--accent-light);
+        }
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            width: 44px;
+            height: 44px;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            z-index: 99;
+        }
+        .footer {
+            background: var(--surface-soft);
+            padding: 2rem 0;
+            text-align: center;
+            border-top: 1px solid var(--border-light);
+        }
+        @media (max-width: 700px) {
+            .container { padding: 0 1.2rem; }
+            .search-filter { flex-direction: column; border-radius: 28px; align-items: stretch; }
+            .random-btn, .back-to-top { width: 44px; height: 44px; font-size: 1.2rem; }
+        }
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            grid-column: 1 / -1;
+        }
+        .fun-fact-ticker {
+            background: var(--surface);
+            border-radius: 60px;
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+            border: 1px solid var(--border-light);
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container nav-container">
+        <div class="logo"><a href="#"><i class="fas fa-paw"></i> Animalia</a></div>
+        <ul class="nav-links">
+            <li><a href="#home"><i class="fas fa-home"></i> Beranda</a></li>
+            <li><a href="#encyclopedia"><i class="fas fa-book-open"></i> Ensiklopedia</a></li>
+            <li><a href="#about"><i class="fas fa-leaf"></i> Tentang</a></li>
+            <li><a href="#contact"><i class="fas fa-envelope"></i> Kontak</a></li>
+            <li><button class="dark-toggle" id="darkModeToggle"><i class="fas fa-moon"></i> Mode</button></li>
+        </ul>
+    </div>
+</nav>
+
+<main>
+    <section id="home">
+        <div class="container hero">
+            <h1>Wonder of <span style="font-style: italic;">Wildlife</span></h1>
+            <p>Jelajahi fauna dengan sentuhan modern — favoritkan, filter, dan temukan fakta menarik setiap spesies.</p>
+        </div>
+    </section>
+
+    <div class="container" id="encyclopedia">
+        <div class="search-filter">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari hewan, nama ilmiah, fakta...">
+            </div>
+            <div class="filter-group">
+                <button class="filter-btn active" data-cat="all">Semua</button>
+                <button class="filter-btn" data-cat="mamalia">Mamalia</button>
+                <button class="filter-btn" data-cat="burung">Burung</button>
+                <button class="filter-btn" data-cat="aquatik">Aquatik</button>
+                <button class="filter-btn" data-cat="reptil">Reptil</button>
+                <button class="fav-filter-btn" id="favFilterBtn"><i class="fas fa-heart"></i> Favorit</button>
+                <select id="sortSelect" class="sort-select">
+                    <option value="asc">Nama A-Z</option>
+                    <option value="desc">Nama Z-A</option>
+                </select>
+                <button id="resetFiltersBtn" class="reset-btn"><i class="fas fa-undo-alt"></i> Reset</button>
+            </div>
+        </div>
+        <div class="fun-fact-ticker" id="funFactTicker">
+            <i class="fas fa-lightbulb"></i> Tahukah kamu? Hiu paus memiliki corak bintik unik seperti sidik jari.
+        </div>
+        <div class="section-title">
+            <span><i class="fas fa-feather-alt"></i> Animal Encyclopedia</span>
+            <span class="result-count" id="resultCount">0 spesies</span>
+        </div>
+        <div class="animal-grid" id="animalGrid"></div>
+    </div>
+
+    <div class="container" id="about">
+        <div style="margin: 2rem 0 1rem; display: flex; flex-wrap: wrap; gap: 2rem; background: var(--surface); border-radius: 32px; padding: 2rem; border: 1px solid var(--border-light);">
+            <div style="flex:1;"><h3 style="font-family: 'Playfair Display';"><i class="fas fa-seedling" style="color: var(--accent);"></i> Tentang Animalia</h3><p>Animalia adalah ensiklopedia digital modern dengan fitur favorit, dark mode, dan sorting. Setiap informasi disusun untuk menumbuhkan rasa cinta terhadap satwa.</p></div>
+            <div id="contact" style="flex:1;"><h3 style="font-family: 'Playfair Display';"><i class="fas fa-envelope-open-text"></i> Hubungi Kami</h3><p><i class="fas fa-envelope"></i> hello@animalia.id</p><p><i class="fab fa-instagram"></i> @animalia_wild</p><p><i class="fas fa-map-marker-alt"></i> Konservasi fauna Nusantara</p></div>
+        </div>
+    </div>
+</main>
+<footer class="footer"><div class="container"><i class="fas fa-paw"></i> Animal Encyclopedia — Menghormati keanekaragaman hayati dengan sentuhan elegan.</div></footer>
+
+<div id="animalModal" class="modal"><div class="modal-card"><button class="close-modal" id="closeModalBtn">&times;</button><img id="modalImg" class="modal-img" alt="detail"><div class="modal-content"><div class="modal-header"><div class="modal-title" id="modalTitle"></div></div><div class="modal-scientific" id="modalScientific"></div><div class="modal-detail" id="modalDesc"></div><div class="extra-fact" id="modalExtra"></div></div></div></div>
+
+<button class="random-btn" id="randomAnimalBtn"><i class="fas fa-dice-d6"></i></button>
+<button class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></button>
+
+<script>
+    // extended animal database
+    const animalsData = [
+        { id: 1, name: "Harimau Sumatra", scientific: "Panthera tigris sondaica", category: "mamalia", shortDesc: "Subspesies harimau terkecil, endemik Sumatra, kritis.", fact: "Panjang: 2.2-2.5m | Berat: 100-140kg", img: "https://bskdn.kemendagri.go.id/website/wp-content/uploads/2018/03/Harimau.jpg", extraDetail: "Populasi kurang dari 400 individu di alam liar. Belang harimau Sumatra lebih rapat." },
+        { id: 2, name: "Gajah Semak Afrika", scientific: "Loxodonta africana", category: "mamalia", shortDesc: "Hewan darat terbesar, telinga lebar, sosial.", fact: "Herbivora | Kelompok matriarkal", img: "https://upload.wikimedia.org/wikipedia/commons/9/9b/Elephant_in_Botswana.JPG", extraDetail: "Gajah betina memimpin kawanan, memiliki ingatan luar biasa." },
+        { id: 3, name: "Lumba-lumba Botol", scientific: "Tursiops truncatus", category: "aquatik", shortDesc: "Mamalia laut cerdas, ekolokasi, sosial.", fact: "EQ tinggi | Piscivora", img: "https://cdn0-production-images-kly.akamaized.net/CNpbSKNIFYQ6yJMXe3MWUgJHXkc=/1280x720/smart/filters:quality(75):strip_icc()/kly-media-production/medias/4156416/original/060545800_1663062250-pexels-hamid-elbaz-225869.jpg", extraDetail: "Dapat melompat hingga 5 meter. Setiap lumba-lumba memiliki 'peluit' unik." },
+        { id: 4, name: "Merak Hijau", scientific: "Pavo muticus", category: "burung", shortDesc: "Burung ikonik Asia Tenggara, bulu metalik.", fact: "Tarian kawin memukau | Terancam", img: "https://www.greeners.co/wp-content/uploads/2017/05/Fauna-Burung-Merak-Hijau-Keindahan-yang-Terancam.jpg", extraDetail: "Merak hijau dapat terbang meskipun sering terlihat di tanah." },
+        { id: 5, name: "Serigala Arktik", scientific: "Canis lupus arctos", category: "mamalia", shortDesc: "Serigala putih tahan beku, hidup berkelompok.", fact: "Tahan beku ekstrem | Karnivora", img: "https://media.istockphoto.com/id/131626935/id/foto/serigala-arktik-di-salju-melihat-kamera.jpg?s=612x612&w=0&k=20&c=rlUwYBS6OK3l7hTR3_riE_4G3NyQg1R6yTKvlRQmP9w=", extraDetail: "Bulu tebal ganda menjaga suhu tubuh hingga -50°C." },
+        { id: 6, name: "Orangutan Borneo", scientific: "Pongo pygmaeus", category: "mamalia", shortDesc: "Kera besar cerdas, menggunakan alat.", fact: "97% DNA mirip manusia | frugivora", img: "https://www.orangutan.or.id/cfind/source/thumb/images/homepage/our-work/faq-orangutans/cover_w375_h280_image-small-orangutan-faq-final.jpg", extraDetail: "Orangutan jantan dewasa memiliki kantong tenggorokan besar." },
+        { id: 7, name: "Kuda Nil", scientific: "Hippopotamus amphibius", category: "mamalia", shortDesc: "Mamalia semi-akuatik, sangat teritorial.", fact: "Kecepatan darat 30 km/jam | Nokturnal", img: "https://awsimages.detik.net.id/community/media/visual/2024/04/24/kuda-nil-gen-chan.webp?w=600&q=90", extraDetail: "Kuda nil mengeluarkan 'keringat darah' sebagai tabir surya alami." },
+        { id: 8, name: "Elang Botak", scientific: "Haliaeetus leucocephalus", category: "burung", shortDesc: "Simbol nasional AS, pemangsa puncak.", fact: "Visi 4-5x manusia | Memangsa ikan", img: "https://cdn.grid.id/crop/23x0:902x555/x/photo/2019/05/20/1674312253.jpg", extraDetail: "Sarang elang botak bisa mencapai berat 2 ton." },
+        { id: 9, name: "Komodo", scientific: "Varanus komodoensis", category: "reptil", shortDesc: "Kadal terbesar di dunia, endemik Indonesia.", fact: "Bisa berlari 20 km/jam | Bisa mematikan", img: "https://news.files.bbci.co.uk/include/extra/shorthand/assets/indonesia/m3oHVdWQZQ/assets/QklT8DU6M0/gettyimages-467076862-resize_v2-2057x1157.jpeg", extraDetail: "Komodo memiliki kelenjar racun yang melumpuhkan mangsa." },
+        { id: 10, name: "Pinguin Kaisar", scientific: "Aptenodytes forsteri", category: "burung", shortDesc: "Pinguin terbesar, beradaptasi di Antartika.", fact: "Tahan suhu -60°C | Berenang handal", img: "https://awsimages.detik.net.id/community/media/visual/2022/11/13/penguin-kaisar-1_169.jpeg?w=1200", extraDetail: "Pejantan mengerami telur selama 2 bulan tanpa makan." },
+        { id: 11, name: "Hiu Paus", scientific: "Rhincodon typus", category: "aquatik", shortDesc: "Ikan terbesar di lautan, pemakan plankton.", fact: "Panjang hingga 18m | Ramah", img: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Whale_shark_Georgia_aquarium.jpg", extraDetail: "Corak bintik unik seperti sidik jari." },
+        { id: 12, name: "Kanguru Merah", scientific: "Macropus rufus", category: "mamalia", shortDesc: "Marsupial ikonik Australia, lompatan kuat.", fact: "Lompat 9 meter | Herbivora", img: "https://media.istockphoto.com/id/1253825174/id/foto/kanguru-merah-makropus-rufus-australia-grup-berjalan.jpg?s=612x612&w=0&k=20&c=GIce9wRGUJvY9aUgXM9YE0HeYgFeC6wDNdrsTkIth7U=", extraDetail: "Kanguru betina memiliki kantung untuk membesarkan anak (joey)." },
+        { id: 13, name: "Cendrawasih Kuning", scientific: "Paradisaea apoda", category: "burung", shortDesc: "Burung surga dari Papua, bulu eksotis.", fact: "Tarian kawin spektakuler | Endemik", img: "https://piro-system.com/wp-content/uploads/2026/01/cendrawasih-2-1024x683-1.webp", extraDetail: "Jantan memiliki bulu hias yang memukau untuk menarik betina." },
+        { id: 14, name: "Penyu Hijau", scientific: "Chelonia mydas", category: "reptil", shortDesc: "Penyu laut herbivora, migrasi ribuan km.", fact: "Umur hingga 80 tahun | Terancam", img: "https://animalium.id/wp-content/uploads/2024/04/Penyu-Hijau.jpg", extraDetail: "Penyu hijau kembali ke pantai kelahiran untuk bertelur." },
+        { id: 15, name: "Badak Jawa", scientific: "Rhinoceros sondaicus", category: "mamalia", shortDesc: "Badak paling langka, hanya di Ujung Kulon.", fact: "Satu tanduk | Sangat kritis", img: "https://tribratanews.polri.go.id/web/image/blog.post/65237/image", extraDetail: "Populasi kurang dari 80 ekor, sangat dilindungi." }
+    ];
+
+    let currentCategory = "all";
+    let searchTerm = "";
+    let onlyFavorites = false;
+    let currentSort = "asc";
+    let favoriteIds = JSON.parse(localStorage.getItem("animalia_favorites") || "[]");
+
+    function saveFavorites() { localStorage.setItem("animalia_favorites", JSON.stringify(favoriteIds)); }
+    function toggleFavorite(id) {
+        if (favoriteIds.includes(id)) favoriteIds = favoriteIds.filter(fid => fid !== id);
+        else favoriteIds.push(id);
+        saveFavorites();
+        renderGrid();
+    }
+
+    function getFilteredAndSorted() {
+        let filtered = animalsData.filter(animal => {
+            const matchCat = currentCategory === "all" || animal.category === currentCategory;
+            const matchSearch = searchTerm === "" || animal.name.toLowerCase().includes(searchTerm) || animal.scientific.toLowerCase().includes(searchTerm) || animal.shortDesc.toLowerCase().includes(searchTerm) || animal.fact.toLowerCase().includes(searchTerm);
+            const matchFav = onlyFavorites ? favoriteIds.includes(animal.id) : true;
+            return matchCat && matchSearch && matchFav;
+        });
+        filtered.sort((a,b) => {
+            if (currentSort === "asc") return a.name.localeCompare(b.name);
+            else return b.name.localeCompare(a.name);
+        });
+        return filtered;
+    }
+
+    function renderGrid() {
+        const filtered = getFilteredAndSorted();
+        const grid = document.getElementById("animalGrid");
+        const resultSpan = document.getElementById("resultCount");
+        resultSpan.innerText = `${filtered.length} spesies`;
+        if (filtered.length === 0) { grid.innerHTML = `<div class="no-results"><i class="fas fa-paw"></i> Tidak ditemukan hewan yang cocok.</div>`; return; }
+        grid.innerHTML = filtered.map(animal => `<div class="card" data-id="${animal.id}">
+            <img class="card-img" src="${animal.img}" alt="${animal.name}" loading="lazy" onerror="this.src='https://placehold.co/600x400?text=Animalia'">
+            <div class="card-content">
+                <div class="card-header"><span class="card-title">${animal.name}</span><button class="favorite-icon" data-id="${animal.id}"><i class="${favoriteIds.includes(animal.id) ? 'fas fa-heart' : 'far fa-heart'}"></i></button></div>
+                <div class="scientific">${animal.scientific}</div>
+                <div class="desc">${animal.shortDesc}</div>
+                <div class="fact"><i class="fas fa-lightbulb"></i> ${animal.fact}</div>
+            </div></div>`).join("");
+        document.querySelectorAll('.card').forEach(card => { card.addEventListener('click', (e) => { if (!e.target.closest('.favorite-icon')) { const id = parseInt(card.getAttribute('data-id')); const animal = animalsData.find(a => a.id === id); if(animal) openModal(animal); } }); });
+        document.querySelectorAll('.favorite-icon').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const id = parseInt(btn.getAttribute('data-id')); toggleFavorite(id); }); });
+    }
+
+    function openModal(animal) {
+        const modal = document.getElementById("animalModal");
+        document.getElementById("modalImg").src = animal.img;
+        document.getElementById("modalTitle").innerHTML = `${animal.name} <i class="fas fa-paw"></i>`;
+        document.getElementById("modalScientific").innerText = animal.scientific;
+        document.getElementById("modalDesc").innerHTML = `<strong>Deskripsi:</strong> ${animal.shortDesc}<br><strong>Fakta singkat:</strong> ${animal.fact}`;
+        document.getElementById("modalExtra").innerHTML = `<i class="fas fa-leaf"></i> ${animal.extraDetail || "Spesies ini memiliki peran penting dalam ekosistemnya."}`;
+        modal.style.display = "flex";
+    }
+    function closeModal() { document.getElementById("animalModal").style.display = "none"; }
+
+    // Event listeners
+    document.getElementById("searchInput").addEventListener("input", (e) => { searchTerm = e.target.value.toLowerCase(); renderGrid(); });
+    document.querySelectorAll(".filter-btn").forEach(btn => { btn.addEventListener("click", () => { document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active")); btn.classList.add("active"); currentCategory = btn.getAttribute("data-cat"); onlyFavorites = false; document.getElementById("favFilterBtn").classList.remove("active"); renderGrid(); }); });
+    document.getElementById("favFilterBtn").addEventListener("click", () => { onlyFavorites = !onlyFavorites; if(onlyFavorites) { document.getElementById("favFilterBtn").classList.add("active"); document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active")); currentCategory = "all"; } else { document.getElementById("favFilterBtn").classList.remove("active"); } renderGrid(); });
+    document.getElementById("sortSelect").addEventListener("change", (e) => { currentSort = e.target.value; renderGrid(); });
+    document.getElementById("resetFiltersBtn").addEventListener("click", () => { searchTerm = ""; document.getElementById("searchInput").value = ""; currentCategory = "all"; onlyFavorites = false; currentSort = "asc"; document.getElementById("sortSelect").value = "asc"; document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active")); document.querySelector(".filter-btn[data-cat='all']").classList.add("active"); document.getElementById("favFilterBtn").classList.remove("active"); renderGrid(); });
+    window.addEventListener("click", (e) => { const modal = document.getElementById("animalModal"); if (e.target === modal) closeModal(); });
+    document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+    document.getElementById("randomAnimalBtn").addEventListener("click", () => { const randomIndex = Math.floor(Math.random() * animalsData.length); openModal(animalsData[randomIndex]); });
+    document.getElementById("backToTop").addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+    const funFacts = ["Hiu paus memiliki corak bintik unik.", "Kuda nil 'berkeringat darah' sebagai tabir surya.", "Orangutan 97% DNA mirip manusia.", "Komodo bisa mendeteksi bau hingga 10 km.", "Pinguin kaisar pejantan mengerami telur 2 bulan tanpa makan."];
+    setInterval(() => { const rand = funFacts[Math.floor(Math.random() * funFacts.length)]; document.getElementById("funFactTicker").innerHTML = `<i class="fas fa-lightbulb"></i> Tahukah kamu? ${rand}`; }, 7000);
+    // dark mode
+    const darkToggle = document.getElementById("darkModeToggle");
+    if(localStorage.getItem("darkMode") === "enabled") document.body.classList.add("dark");
+    darkToggle.addEventListener("click", () => { document.body.classList.toggle("dark"); localStorage.setItem("darkMode", document.body.classList.contains("dark") ? "enabled" : "disabled"); });
+    renderGrid();
+    // smooth scroll nav
+    document.querySelectorAll('.nav-links a[href^="#"]').forEach(link => { link.addEventListener('click', function(e) { const targetId = this.getAttribute('href').substring(1); const target = document.getElementById(targetId); if(targetId && target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); } }); });
+</script>
+</body>
+</html>
