@@ -655,51 +655,7 @@
         { id: 25, name: "Bison Amerika", scientific: "Bison bison", category: "mamalia", shortDesc: "Mamalia besar padang rumput Amerika Utara.", fact: "Lari 55 km/jam | Punya punuk", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiD2GOFx0ojUBFpD1FmcQF_0Iq7FmlIA7o7Q&s", extraDetail: "Bison jantan dapat mencapai berat hingga 1.000 kg.", diet: "Herbivora (rumput)" }
     ];
 
-    // ---------- LOGIKA AI (Rule-based cerdas) ----------
-    function getAIResponse(userQuery) {
-        const q = userQuery.toLowerCase();
-        // Cek pertanyaan tentang makanan hewan
-        if (q.includes("makan") || q.includes("diet") || q.includes("memakan")) {
-            for (let animal of animalsData) {
-                if (q.includes(animal.name.toLowerCase())) {
-                    return `${animal.name} adalah hewan ${animal.diet || (animal.category === 'karnivora' ? 'karnivora' : 'herbivora/omnivora')}. ${animal.fact.split('|')[0]}`;
-                }
-            }
-            return "Hewan apa yang ingin kamu ketahui makanannya? Sebutkan namanya, misal 'makanan harimau'.";
-        }
-        // Rekomendasi hewan berdasarkan kategori atau sifat
-        if (q.includes("rekomendasi") || q.includes("saran") || q.includes("hewan apa")) {
-            if (q.includes("herbivora")) {
-                let herb = animalsData.filter(a => a.diet && a.diet.toLowerCase().includes("herbivora")).slice(0,3).map(a=>a.name).join(", ");
-                return `Beberapa hewan herbivora: ${herb}. Mereka hanya memakan tumbuhan.`;
-            } else if (q.includes("karnivora") || q.includes("pemakan daging")) {
-                let carn = animalsData.filter(a => a.diet && a.diet.toLowerCase().includes("karnivora")).slice(0,3).map(a=>a.name).join(", ");
-                return `Hewan karnivora contohnya: ${carn}. Mereka memangsa hewan lain.`;
-            } else {
-                return "Kamu bisa minta rekomendasi hewan herbivora atau karnivora. Coba tanya: 'rekomendasi hewan herbivora'.";
-            }
-        }
-        // Fakta random tentang hewan tertentu
-        for (let animal of animalsData) {
-            if (q.includes(animal.name.toLowerCase())) {
-                return `${animal.name} (${animal.scientific}): ${animal.shortDesc} Fakta: ${animal.fact}. ${animal.extraDetail.substring(0, 100)}`;
-            }
-        }
-        // Pertanyaan tentang kategori
-        if (q.includes("mamalia") || q.includes("burung") || q.includes("reptil") || q.includes("aquatik")) {
-            let cat = "";
-            if (q.includes("mamalia")) cat = "mamalia";
-            else if (q.includes("burung")) cat = "burung";
-            else if (q.includes("reptil")) cat = "reptil";
-            else if (q.includes("aquatik") || q.includes("laut")) cat = "aquatik";
-            let contoh = animalsData.filter(a => a.category === cat).slice(0,3).map(a=>a.name).join(", ");
-            return `Contoh hewan ${cat}: ${contoh}. Ada total ${animalsData.filter(a=>a.category===cat).length} spesies di kategori ini.`;
-        }
-        // Jika tidak dikenali
-        return "Maaf, saya belum mengerti. Coba tanyakan tentang makanan hewan, rekomendasi kategori, atau sebutkan nama hewan spesifik (contoh: 'Harimau Sumatra'). Saya siap membantu!";
-    }
-
-    // ---------- CHATBOT UI ----------
+    // ---------- CHATBOT UI & API INTEGRATION ----------
     const chatToggle = document.getElementById('chatbotToggle');
     const chatWindow = document.getElementById('chatWindow');
     const closeChat = document.getElementById('closeChat');
@@ -707,10 +663,20 @@
     const sendBtn = document.getElementById('sendChat');
     const chatMessages = document.getElementById('chatMessages');
 
+    let chatHistory = [];
+
     function addMessage(text, isUser) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-        msgDiv.innerText = text;
+        
+        // Simple Markdown bold support (**text**)
+        let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // Simple Markdown italic support (*text*)
+        formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        // Support line breaks
+        formattedText = formattedText.replace(/\n/g, '<br>');
+        
+        msgDiv.innerHTML = formattedText;
         chatMessages.appendChild(msgDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
@@ -718,16 +684,43 @@
     async function handleUserMessage() {
         const userText = chatInput.value.trim();
         if (!userText) return;
+
         addMessage(userText, true);
         chatInput.value = '';
-        addMessage("🧠 Fauna AI sedang berpikir...", false);
-        const typingMsg = chatMessages.lastChild;
-        // Simulasi delay AI
-        setTimeout(() => {
-            typingMsg.remove();
-            const reply = getAIResponse(userText);
-            addMessage(reply, false);
-        }, 600);
+
+        // Show typing indicator
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot-message typing';
+        typingDiv.innerText = "🧠 Fauna AI sedang berpikir...";
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        try {
+            const response = await fetch('http://localhost:3000/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    message: userText,
+                    history: chatHistory 
+                })
+            });
+
+            const data = await response.json();
+            typingDiv.remove();
+
+            if (data.reply) {
+                addMessage(data.reply, false);
+                // Update history
+                chatHistory.push({ role: "user", parts: [{ text: userText }] });
+                chatHistory.push({ role: "model", parts: [{ text: data.reply }] });
+            } else {
+                addMessage("Maaf, saya sedang mengalami kendala teknis.", false);
+            }
+        } catch (error) {
+            typingDiv.remove();
+            addMessage("Gagal terhubung ke server. Pastikan backend sudah dijalankan.", false);
+            console.error("Fetch error:", error);
+        }
     }
 
     sendBtn.addEventListener('click', handleUserMessage);
