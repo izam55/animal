@@ -29,7 +29,7 @@ app.post('/api/chat', async (req, res) => {
         try {
             // Cobalah dengan Grounding (Google Search)
             const response = await client.models.generateContent({
-                model: 'gemini-2.5-flash',
+                model: 'gemini-1.5-flash',
                 contents: [
                     ...history,
                     { role: 'user', parts: [{ text: message }] }
@@ -46,7 +46,7 @@ app.post('/api/chat', async (req, res) => {
             
             // Fallback: Tanpa Grounding
             const response = await client.models.generateContent({
-                model: 'gemini-2.5-flash',
+                model: 'gemini-1.5-flash',
                 contents: [
                     ...history,
                     { role: 'user', parts: [{ text: message }] }
