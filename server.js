@@ -19,6 +19,7 @@ const client = new GoogleGenAI({
 });
 
 app.post('/api/chat', async (req, res) => {
+    console.log("API Chat called with message:", req.body.message);
     const { message, history } = req.body;
 
     // Convert history format if necessary (SDK @google/genai expects specific format)
