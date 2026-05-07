@@ -4,7 +4,6 @@ const cors = require('cors');
 const { GoogleGenAI } = require("@google/genai");
 
 const app = express();
-const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -14,25 +13,23 @@ app.get('/', (req, res) => {
 });
 
 // Inisialisasi Google GenAI Client
+// Pastikan GEMINI_API_KEY sudah diset di Vercel Environment Variables
 const client = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY,
 });
 
 app.post('/api/chat', async (req, res) => {
-    console.log("API Chat called with message:", req.body.message);
     const { message, history } = req.body;
+    console.log("Pesan diterima:", message);
 
-    // Convert history format if necessary (SDK @google/genai expects specific format)
-    // History dari frontend: [{ role: "user", parts: [{ text: "..." }] }]
-    // SDK ini juga mengharapkan format yang mirip.
-    
     try {
         try {
             // Cobalah dengan Grounding (Google Search)
+            // Catatan: Fitur ini mungkin memerlukan akses khusus atau model tertentu
             const response = await client.models.generateContent({
                 model: 'gemini-1.5-flash',
                 contents: [
-                    ...history,
+                    ...(history || []),
                     { role: 'user', parts: [{ text: message }] }
                 ],
                 config: {
@@ -43,13 +40,13 @@ app.post('/api/chat', async (req, res) => {
 
             return res.json({ reply: response.text });
         } catch (groundingError) {
-            console.error("Grounding Error with @google/genai, falling back:", groundingError);
+            console.warn("Gagal menggunakan Grounding, mencoba tanpa Google Search:", groundingError.message);
             
             // Fallback: Tanpa Grounding
             const response = await client.models.generateContent({
                 model: 'gemini-1.5-flash',
                 contents: [
-                    ...history,
+                    ...(history || []),
                     { role: 'user', parts: [{ text: message }] }
                 ],
                 config: {
@@ -60,13 +57,21 @@ app.post('/api/chat', async (req, res) => {
             return res.json({ reply: response.text });
         }
     } catch (error) {
-        console.error("Critical AI Error with @google/genai:", error);
-        res.status(500).json({ error: "Terjadi kesalahan pada server AI baru." });
+        console.error("Kesalahan Fatal AI:", error);
+        res.status(500).json({ 
+            error: "Gagal memproses pesan AI.",
+            details: error.message 
+        });
     }
 });
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
-
+// Export app untuk Vercel
 module.exports = app;
+
+// Jalankan server hanya jika dijalankan secara lokal
+if (require.main === module) {
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}`);
+    });
+}
